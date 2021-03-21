@@ -5,8 +5,8 @@
 	define('INSTALL', 'true');
 	//site configurations
 	define('FORCE_SSL', 'true');
-	define('ALLOW_ORIGINS', 'tpo.chakdev.info');
-	define('SITE', 'Twitch PHP Overlay');
+	define('ALLOW_ORIGINS', '');
+	define('SITE', 'mysite.com');
 	define('SITE_ID', '1');
 	define('SITE_MODE', 'hybrid');
 	define('SITE_LAYOUT', 'col0');

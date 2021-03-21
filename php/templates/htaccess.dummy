@@ -1,0 +1,63 @@
+RewriteEngine on
+###############################################
+RewriteBase /
+#RewriteCond %{HTTP_HOST} ^www\.(.*)$ [NC]
+#RewriteRule ^(.*)$ https://%1/$1 [R=301,L]
+###############################################
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+###############################################
+RewriteRule ^api/([a-zA-Z0-9]+)?$ /index.php?m=$1&%{QUERY_STRING} [QSA,N]
+###############################################
+RewriteRule ^overlay/(.*)?$ /index.php?m=views&r=overlay&tkn=$1&%{QUERY_STRING} [QSA,N]
+###############################################
+RewriteRule ^chat/(.*)?$ /index.php?m=views&r=home&channel=$1&%{QUERY_STRING} [QSA,N]
+###############################################
+RewriteRule ^download/(.*)?$ /stream.php?m=dispatchFile&tkn=$1&%{QUERY_STRING} [QSA,N]
+###############################################
+RewriteRule ^media/(.*)?$ /stream.php?m=dispatchFile&tkn=$1&%{QUERY_STRING} [QSA,L]
+###############################################
+RewriteRule ^video/(.*)?$ /stream.php?m=views&r=video&tkn=$1&%{QUERY_STRING} [QSA,L]
+###############################################
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^(.*?)/?$ /index.php?m=views&r=$1&%{QUERY_STRING} [NC,L]
+###############################################
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^(.+)\.php$ /$1 [R,L]
+###############################################
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule \.(sh|log|json|lock|phar|ini|sql|js|css)$ /duuuude [NC]
+###############################################
+Options -Indexes
+IndexIgnore *
+###############################################
+<Files config.php>
+	order allow,deny
+	Deny from all
+</Files>
+###############################################
+#RequestHeader append authorization "Bearer {{APIKEY}}"
+###############################################
+<FilesMatch "(^#.*#|.(bak|config|dist|fla|inc|ini|log|psd|sh|sql|sw[op]|sh|log|json|lock|phar)|~)$">
+    # Apache < 2.3
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+        Satisfy All
+    </IfModule>
+    # Apache ≥ 2.3
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+</FilesMatch>
+###############################################
+<IfModule mod_headers.c>
+    #                           (1)     (2)
+    Header set X-XSS-Protection "1; mode=block"
+    <FilesMatch ".(appcache|crx|css|cur|eot|gif|htc|ico|jpe?g|js|m4a|m4v|manifest|mp4|oex|oga|ogg|ogv|opus|otf|pdf|png|safariextz|svgz?|ttf|vcf|webapp|webm|webp|woff|xml|xpi)$">
+        Header unset X-XSS-Protection
+    </FilesMatch>
+</IfModule>
+###############################################
+php_value error_log {{php_errors}}
+###############################################

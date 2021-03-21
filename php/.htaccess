@@ -1,0 +1,9 @@
+#Options -Indexes
+#AuthType Basic
+#AuthName "Restricted"
+#AuthUserFile /etc/chakdev.info/passwd
+#Require user admin
+<FilesMatch "^(.*.)\.(.*.)$">
+	Order allow,deny
+	Deny from all
+</FilesMatch>

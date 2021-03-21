@@ -1,0 +1,12 @@
+.progress{
+    position: fixed;
+    left: 0;
+    width: 100%;
+    height: 60px;
+}
+
+.widget-preloader{
+	position: absolute;
+	z-index: 10;
+	top: -10px;
+}

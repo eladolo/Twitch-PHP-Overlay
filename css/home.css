@@ -1,0 +1,23 @@
+html,body{
+	overflow-x: hidden !important;
+}
+.btnLogin{
+	width: 100%;
+}
+
+.home_sections{
+	margin-top: -10px;
+}
+
+.parallax-container{
+	margin-bottom: -30px;
+}
+
+.parallax-pos1{
+	background-position: 325px;
+}
+
+iframe{
+	cursor: help;
+	float: left;
+}

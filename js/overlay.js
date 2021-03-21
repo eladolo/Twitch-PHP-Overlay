@@ -1,62 +1,64 @@
 app.overlay = (function(){
-	var root = {};
+    var root = {};
+    var queue = [];
 
-	var _vue = function(){
-		app.ui_vue.titulo = new Vue({
-			el: '#titulo',
-			store: app.store,
-			data: {
-				titulo: app.lang.welcome_to + app.site
-			},
+    var _vue = function(){
+        app.ui_vue.titulo = new Vue({
+            el: '#titulo',
+            store: app.store,
+            data: {
+                titulo: app.lang.welcome_to + app.site
+            },
             mounted: function () {
                 this.$nextTick(function () {
                     $("#titulo").addClass('magictime').removeClass('hide');
                 });
             }
-		});
+        });
 
-		app.logs("overlay init vue!");
-	};
+        app.logs("overlay init vue!");
+    };
 
-	var _jquery = function(){
-		app.overlays = window.overlays;
+    var _jquery = function(){
+        app.overlays = window.overlays;
 
-		_pub_connect();
+        _pub_connect();
 
         var tmp_chat_res = _chat_connect();
         root.open = tmp_chat_res.open;
         root.close = tmp_chat_res.close;
         root.send = tmp_chat_res.send;
 
-		app.logs("overlay init jquery!");
-	};
+        app.logs("overlay init jquery!");
+    };
 
-	var _init = function(){
-		_vue();
-		_jquery();
+    var _init = function(){
+        _vue();
+        _jquery();
 
-		if(typeof sessionStorage.tmp_overlay_exec != "undefined"){
-			var tmp_overlay_exec = JSON.parse(sessionStorage.tmp_overlay_exec);
-			_execOverlay(tmp_overlay_exec);
-		}
+        if(typeof sessionStorage.tmp_overlay_exec != "undefined"){
+            var tmp_overlay_exec = JSON.parse(sessionStorage.tmp_overlay_exec);
+            _execOverlay(tmp_overlay_exec);
+        }
 
-		if(app.debug) app.alert("overlay load!");
-	};
+        if(app.debug) app.alert("overlay load!");
+    };
 
-	/*
+    /*
     * function for executing overlay reward
     */
-	var overlay_interval;
-	var _execOverlay = function(alert){
-	    $('.content_img img').prop("src", "");
-	    $('.content_img .spin, .content_img .static').addClass('hide');
-	    $('.content_img').removeClass('top').removeClass('center').removeClass('bottom').removeClass('right').removeClass('left');
-	    $('.content_img img, .content_img .alert_body').removeClass('equis').removeClass('star').removeClass('crazy_star').removeClass('heart').removeClass('diamond').removeClass('trapezoid').removeClass('pentagon').removeClass('rectanglev').removeClass('rectangleh').removeClass('triangle').removeClass('circle_ov').removeClass('round').removeClass('overlap').removeClass('transparent');
-	    $('.content_img').removeClass('magictime').removeClass('puffIn').removeClass('puffOut').removeClass('vanishIn').removeClass('vanishOut').removeClass('foolishIn').removeClass('holeOut').removeClass('swashIn').removeClass('swashOut').removeClass('swap').removeClass('twisterInDown').removeClass('twisterInUp').removeClass('magic').removeClass('openDownLeft').removeClass('openDownRight').removeClass('openUpLeft').removeClass('openUpRight').removeClass('openDownLeftReturn').removeClass('openDownRightReturn').removeClass('openUpRightReturn').removeClass('openUpRight').removeClass('bombRightOut').removeClass('bombLeftOut').removeClass('tinRightOut').removeClass('tinLeftOut').removeClass('tinUpOut').removeClass('tinDownOut').removeClass('tinRightIn').removeClass('tinLeftIn').removeClass('tinUpIn').removeClass('tinDownIn').removeClass('boingInUp').removeClass('boingOutDown').removeClass('spaceOutUp').removeClass('spaceOutRight').removeClass('spaceOutDown').removeClass('spaceOutLeft').removeClass('spaceInUp').removeClass('spaceInRight').removeClass('spaceInDown').removeClass('spaceInLeft').removeClass('rotateDown').removeClass('rotateUp').removeClass('rotateLeft').removeClass('rotateRight');
-	    $('.content_img').hide();
-	    if(typeof overlay_interval != "undefined") clearInterval(overlay_interval);
+    var overlay_interval;
+    var _execOverlay = function(alert){
+        $('.content_img img').prop("src", "");
+        $('.content_img .spin, .content_img .static').addClass('hide');
+        $('.content_img').removeClass('top').removeClass('center').removeClass('bottom').removeClass('right').removeClass('left');
+        $('.content_img img, .content_img .alert_body').removeClass('equis').removeClass('star').removeClass('crazy_star').removeClass('heart').removeClass('diamond').removeClass('trapezoid').removeClass('pentagon').removeClass('rectanglev').removeClass('rectangleh').removeClass('triangle').removeClass('circle_ov').removeClass('round').removeClass('overlap').removeClass('transparent');
+        $('.content_img').removeClass('magictime').removeClass('puffIn').removeClass('puffOut').removeClass('vanishIn').removeClass('vanishOut').removeClass('foolishIn').removeClass('holeOut').removeClass('swashIn').removeClass('swashOut').removeClass('swap').removeClass('twisterInDown').removeClass('twisterInUp').removeClass('magic').removeClass('openDownLeft').removeClass('openDownRight').removeClass('openUpLeft').removeClass('openUpRight').removeClass('openDownLeftReturn').removeClass('openDownRightReturn').removeClass('openUpRightReturn').removeClass('openUpRight').removeClass('bombRightOut').removeClass('bombLeftOut').removeClass('tinRightOut').removeClass('tinLeftOut').removeClass('tinUpOut').removeClass('tinDownOut').removeClass('tinRightIn').removeClass('tinLeftIn').removeClass('tinUpIn').removeClass('tinDownIn').removeClass('boingInUp').removeClass('boingOutDown').removeClass('spaceOutUp').removeClass('spaceOutRight').removeClass('spaceOutDown').removeClass('spaceOutLeft').removeClass('spaceInUp').removeClass('spaceInRight').removeClass('spaceInDown').removeClass('spaceInLeft').removeClass('rotateDown').removeClass('rotateUp').removeClass('rotateLeft').removeClass('rotateRight');
+        $('.content_img').hide();
+        if(typeof overlay_interval != "undefined") clearInterval(overlay_interval);
 
-	    if(alert.status == "0") return true;
+        queue.splice(0, 1);
+
         var tmp_conf = typeof alert.config == "string" ? JSON.parse(alert.config) : alert.config;
 
         var alert_start = function(){
@@ -193,6 +195,11 @@ app.overlay = (function(){
             $('.alert_body, .alert_video').html('');
             $('#alert_css').remove();
             if (tmp_conf.confetti == "1") confetti.stop();
+            if(queue.length > 0) {
+                setTimeout(function(){
+                    _execOverlay(queue[0]);
+                }, 1000);
+            }
         };
 
         var alert_end = function(){
@@ -363,10 +370,10 @@ app.overlay = (function(){
                 }
 
                 if(typeof sessionStorage.tmp_overlay_exec != "undefined"){
-                	sessionStorage.removeItem("tmp_overlay_exec");
-                	setTimeout(function(){
-                		window.close();
-                	}, 1000);
+                    sessionStorage.removeItem("tmp_overlay_exec");
+                    setTimeout(function(){
+                        window.close();
+                    }, 1150);
                 }
             }, end_conf.timer_time * 1000);
         };
@@ -534,10 +541,11 @@ app.overlay = (function(){
                         audioElement.id = "audioAlert";
                         audioElement.setAttribute('src', tmp_conf.audio_url);
                         audioElement.volume = tmp_conf.audio_volumen;
-
+                        audioElement.onplay = function() {
+                            alert_start();
+                        };
                         audioElement.addEventListener('canplay', function() {
                             this.play();
-                            alert_start();
                         }, false);
                         document.body.appendChild(audioElement);
                     }
@@ -546,26 +554,26 @@ app.overlay = (function(){
                 alert_start();
             }
         }
-	};
+    };
 
     /*
     * function for text to speech
     */
     var _readOutLoud = function(message, tmp_conf) {
-	    app.logs(message);
-	    var speech = new SpeechSynthesisUtterance();
+        app.logs(message);
+        var speech = new SpeechSynthesisUtterance();
 
-	    // Set the text and voice attributes.
-	    speech.text = message;
-	    speech.volume = tmp_conf.audio_volumen;
-	    speech.rate = 1;
-	    speech.pitch = 1;
-	    speech.lang = "en-US";
+        // Set the text and voice attributes.
+        speech.text = message;
+        speech.volume = tmp_conf.audio_volumen;
+        speech.rate = 1;
+        speech.pitch = 1;
+        speech.lang = "en-US";
 
-	    window.speechSynthesis.speak(speech);
-	};
+        window.speechSynthesis.speak(speech);
+    };
 
-	/*
+    /*
     * function for listening twitch pup
     */
     var _pub_connect = function() {
@@ -640,12 +648,12 @@ app.overlay = (function(){
 
                 app.getOverlays(function(){
                     $.each(app.overlays, function(index, overlay) {
-                        if(tmp_reward.id == overlay.reward){
+                        if(tmp_reward.id == overlay.reward && overlay.status == "1"){
                             overlay.reward = message.data.redemption;
-                            _execOverlay(overlay);
-                            return false;
+                            queue.push(overlay);
                         }
                     });
+                    if(queue.length > 0) _execOverlay(queue[0]);
                 });
             }
         };
@@ -858,15 +866,15 @@ app.overlay = (function(){
         return new_res;
     };
 
-	root.init = _init;
-	root.exec = _execOverlay;
+    root.init = _init;
+    root.exec = _execOverlay;
     root.open = {};
     root.close = {};
     root.send = {};
 
-	return root;
+    return root;
 })();
 
 $(document).ready(function(){
-	app.overlay.init();
+    app.overlay.init();
 });

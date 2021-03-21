@@ -70,11 +70,8 @@
 					<br>
 					<div id="init_ov">
 						<div class="row">
-<<<<<<< Updated upstream
 							<input id="oid" type="hidden" value="-1">
-=======
 							<input id="oid" type="text" value="-1" class="hide">
->>>>>>> Stashed changes
 							<div id="rewardsContent" class="col l2 m2 s12 input-field">
 								<template>
 									<select id="event_trigger" class="validate">
